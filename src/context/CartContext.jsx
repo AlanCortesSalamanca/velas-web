@@ -65,9 +65,9 @@ export function CartProvider({ children }) {
       dispatch({ type: "ADD_TO_CART", product });
       const existing = items.find((i) => i.productId === product.id);
       if (existing) {
-        toast.success(`Increased "${product.name}" quantity`);
+        toast.success(`Adjusted "${product.name}" quantity for quote`);
       } else {
-        toast.success(`Added "${product.name}" to cart`);
+        toast.success(`Added "${product.name}" to your selection`);
       }
     },
     [items]
@@ -75,7 +75,7 @@ export function CartProvider({ children }) {
 
   const removeFromCart = useCallback((productId, productName) => {
     dispatch({ type: "REMOVE_FROM_CART", productId });
-    toast.success(`Removed "${productName}" from cart`);
+    toast.success(`Removed "${productName}" from your selection`);
   }, []);
 
   const updateQuantity = useCallback((productId, quantity) => {
@@ -84,11 +84,11 @@ export function CartProvider({ children }) {
 
   const clearCart = useCallback(() => {
     dispatch({ type: "CLEAR_CART" });
-    toast.success("Cart cleared");
+    toast.success("Selection cleared");
   }, []);
 
   const subtotal = items.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
+    (sum, item) => sum + item.product.price,
     0
   );
 

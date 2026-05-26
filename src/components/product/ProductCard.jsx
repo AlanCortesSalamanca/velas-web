@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Heart, ShoppingCart } from "lucide-react";
 import { useCart } from "../../context/CartContext";
@@ -21,18 +22,47 @@ export default function ProductCard({ product, index = 0 }) {
       transition={{ duration: 0.4, delay: index * 0.05 }}
       className="group relative flex flex-col gap-3"
     >
-      <div className="relative">
-        <ProductImage src={product.image} alt={product.name} />
+      <Link to={`/product/${product.id}`} className="block">
+        <div className="relative">
+          <ProductImage src={product.image} alt={product.name} />
+
+          {!product.stock && (
+            <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2.5 py-0.5 text-[11px] font-medium text-sage-500 backdrop-blur-sm">
+              Out of stock
+            </span>
+          )}
+        </div>
+
+        <ProductInfo
+          name={product.name}
+          category={product.category}
+          description={product.description}
+        />
+
+        <ProductPrice price={product.price} />
+      </Link>
+
+      <div className="flex items-center gap-2">
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={() => addToCart(product)}
+          disabled={!product.stock}
+          className="flex-1"
+        >
+          <ShoppingCart className="h-3.5 w-3.5" />
+          {product.stock ? "Add to Selection" : "Out of Stock"}
+        </Button>
 
         <IconButton
           variant="ghost"
-          size="sm"
+          size="md"
           label={favorited ? "Remove from favorites" : "Add to favorites"}
           onClick={() => toggleFavorite(product.id, product.name)}
-          className={`absolute right-2 top-2 backdrop-blur-sm transition-colors ${
+          className={`${
             favorited
               ? "bg-rose-100 text-rose-500 hover:bg-rose-200"
-              : "bg-white/80 text-sage-600 hover:bg-white"
+              : "text-sage-400 hover:bg-sage-100"
           }`}
         >
           <Heart
@@ -41,32 +71,7 @@ export default function ProductCard({ product, index = 0 }) {
             }`}
           />
         </IconButton>
-
-        {!product.stock && (
-          <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2.5 py-0.5 text-[11px] font-medium text-sage-500 backdrop-blur-sm">
-            Out of stock
-          </span>
-        )}
       </div>
-
-      <ProductInfo
-        name={product.name}
-        category={product.category}
-        description={product.description}
-      />
-
-      <ProductPrice price={product.price} />
-
-      <Button
-        variant="primary"
-        size="sm"
-        onClick={() => addToCart(product)}
-        disabled={!product.stock}
-        className="mt-1 w-full"
-      >
-        <ShoppingCart className="h-3.5 w-3.5" />
-        {product.stock ? "Add to Cart" : "Out of Stock"}
-      </Button>
     </motion.article>
   );
 }
