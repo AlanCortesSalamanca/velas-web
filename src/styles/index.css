@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @theme {
+  /* ========== Brand (terracotta / warm earth) ========== */
   --color-brand-50: #fdf8f0;
   --color-brand-100: #f9edda;
   --color-brand-200: #f2d7b0;
@@ -12,9 +13,10 @@
   --color-brand-800: #82451e;
   --color-brand-900: #6a3a1b;
 
+  /* ========== Sage (earthy green) ========== */
   --color-sage-50: #f5f7f2;
   --color-sage-100: #e7ebe0;
-  --color-sage-200: d0d8c2;
+  --color-sage-200: #d0d8c2;
   --color-sage-300: #b0be9d;
   --color-sage-400: #92a37b;
   --color-sage-500: #758760;
@@ -23,6 +25,131 @@
   --color-sage-800: #3c4533;
   --color-sage-900: #333a2c;
 
+  /* ========== Pastel accent palette ========== */
+  --color-rose-50: #fff1f2;
+  --color-rose-100: #ffe4e6;
+  --color-rose-200: #fecdd3;
+  --color-rose-300: #fda4af;
+  --color-rose-400: #fb7185;
+  --color-rose-500: #f43f5e;
+
+  --color-peach-50: #fff7ed;
+  --color-peach-100: #ffedd5;
+  --color-peach-200: #fed7aa;
+  --color-peach-300: #fdba74;
+  --color-peach-400: #fb923c;
+  --color-peach-500: #f97316;
+
+  --color-lavender-50: #f5f3ff;
+  --color-lavender-100: #ede9fe;
+  --color-lavender-200: #ddd6fe;
+  --color-lavender-300: #c4b5fd;
+  --color-lavender-400: #a78bfa;
+  --color-lavender-500: #8b5cf6;
+
+  --color-mint-50: #ecfdf5;
+  --color-mint-100: #d1fae5;
+  --color-mint-200: #a7f3d0;
+  --color-mint-300: #6ee7b7;
+  --color-mint-400: #34d399;
+  --color-mint-500: #10b981;
+
+  --color-blush-50: #fdf2f8;
+  --color-blush-100: #fce7f3;
+  --color-blush-200: #fbcfe8;
+  --color-blush-300: #f9a8d4;
+  --color-blush-400: #f472b6;
+  --color-blush-500: #ec4899;
+
+  /* ========== Typography ========== */
   --font-sans: "Inter", "system-ui", "-apple-system", sans-serif;
   --font-serif: "Playfair Display", "Georgia", serif;
+
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.5rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: 2.75rem;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 3.5rem;
+
+  /* ========== Shadows ========== */
+  --shadow-soft: 0 2px 8px rgba(60, 69, 51, 0.06);
+  --shadow-card: 0 4px 16px rgba(60, 69, 51, 0.08);
+  --shadow-elevated: 0 8px 32px rgba(60, 69, 51, 0.1);
+  --shadow-popover: 0 12px 48px rgba(60, 69, 51, 0.14);
+
+  /* ========== Border Radius ========== */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* ========== Spacing ========== */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+  --spacing-30: 7.5rem;
+  --spacing-36: 9rem;
+  --spacing-44: 11rem;
+  --spacing-48: 12rem;
+
+  /* ========== Animations ========== */
+  --animate-fade-in: fade-in 0.4s ease-out;
+  --animate-slide-up: slide-up 0.4s ease-out;
+  --animate-scale-in: scale-in 0.3s ease-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ========== Reusable utility classes ========== */
+.transition-base {
+  transition: all 0.2s ease;
+}
+
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-card);
+}
+
+.prose-candle {
+  color: var(--color-sage-700);
+  line-height: 1.75;
+}
+
+.prose-candle p {
+  margin-bottom: 1rem;
 }
