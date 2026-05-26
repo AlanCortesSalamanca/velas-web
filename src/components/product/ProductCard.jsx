@@ -1,11 +1,18 @@
 import { motion } from "framer-motion";
-import { Heart } from "lucide-react";
+import { Heart, ShoppingCart } from "lucide-react";
+import { useCart } from "../../context/CartContext";
+import { useFavorites } from "../../context/FavoritesContext";
 import ProductImage from "./ProductImage";
 import ProductInfo from "./ProductInfo";
 import ProductPrice from "./ProductPrice";
 import IconButton from "../ui/IconButton";
+import Button from "../ui/Button";
 
 export default function ProductCard({ product, index = 0 }) {
+  const { addToCart } = useCart();
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const favorited = isFavorite(product.id);
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 20 }}
@@ -16,14 +23,25 @@ export default function ProductCard({ product, index = 0 }) {
     >
       <div className="relative">
         <ProductImage src={product.image} alt={product.name} />
+
         <IconButton
           variant="ghost"
           size="sm"
-          label="Add to favorites"
-          className="absolute right-2 top-2 bg-white/80 backdrop-blur-sm hover:bg-white"
+          label={favorited ? "Remove from favorites" : "Add to favorites"}
+          onClick={() => toggleFavorite(product.id, product.name)}
+          className={`absolute right-2 top-2 backdrop-blur-sm transition-colors ${
+            favorited
+              ? "bg-rose-100 text-rose-500 hover:bg-rose-200"
+              : "bg-white/80 text-sage-600 hover:bg-white"
+          }`}
         >
-          <Heart className="h-4 w-4" />
+          <Heart
+            className={`h-4 w-4 transition-smooth ${
+              favorited ? "fill-rose-500" : ""
+            }`}
+          />
         </IconButton>
+
         {!product.stock && (
           <span className="absolute left-2 top-2 rounded-full bg-white/90 px-2.5 py-0.5 text-[11px] font-medium text-sage-500 backdrop-blur-sm">
             Out of stock
@@ -38,6 +56,17 @@ export default function ProductCard({ product, index = 0 }) {
       />
 
       <ProductPrice price={product.price} />
+
+      <Button
+        variant="primary"
+        size="sm"
+        onClick={() => addToCart(product)}
+        disabled={!product.stock}
+        className="mt-1 w-full"
+      >
+        <ShoppingCart className="h-3.5 w-3.5" />
+        {product.stock ? "Add to Cart" : "Out of Stock"}
+      </Button>
     </motion.article>
   );
 }
