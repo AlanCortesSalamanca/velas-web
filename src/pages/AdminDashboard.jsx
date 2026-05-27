@@ -1,9 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FileText, Package, DollarSign, TrendingUp, Inbox } from "lucide-react";
+import { FileText, Package, DollarSign, TrendingUp, Inbox, LogOut } from "lucide-react";
+import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
 import { getQuoteRequests } from "../services/quoteRequestsService";
 import SEO from "../components/seo/SEO";
 import Container from "../components/ui/Container";
+import Button from "../components/ui/Button";
 import AdminStatCard from "../components/admin/AdminStatCard";
 import QuoteRequestsTable from "../components/admin/QuoteRequestsTable";
 import EmptyState from "../components/admin/EmptyState";
@@ -38,8 +42,11 @@ function TableSkeleton() {
 }
 
 export default function AdminDashboard() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [logoutSending, setLogoutSending] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -55,6 +62,19 @@ export default function AdminDashboard() {
       });
     return () => { mounted = false; };
   }, []);
+
+  const handleLogout = async () => {
+    setLogoutSending(true);
+    try {
+      await logout();
+      toast.success("Signed out successfully.");
+      navigate("/login");
+    } catch {
+      toast.error("Failed to sign out.");
+    } finally {
+      setLogoutSending(false);
+    }
+  };
 
   const stats = useMemo(() => {
     const totalRequests = requests.length;
@@ -80,6 +100,7 @@ export default function AdminDashboard() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
+          className="flex items-start justify-between gap-4"
         >
           <div className="flex items-center gap-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-500">
@@ -94,6 +115,16 @@ export default function AdminDashboard() {
               </p>
             </div>
           </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            disabled={logoutSending}
+            className="shrink-0 gap-1.5"
+          >
+            <LogOut className="h-4 w-4" />
+            {logoutSending ? "Signing out..." : "Sign Out"}
+          </Button>
         </motion.div>
 
         {/* Stats cards */}

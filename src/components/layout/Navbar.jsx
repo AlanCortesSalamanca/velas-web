@@ -1,20 +1,23 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
-import { Heart, ShoppingCart, Menu, X } from "lucide-react";
+import { Heart, ShoppingCart, Shield, Menu, X } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { useFavorites } from "../../context/FavoritesContext";
-
-const navLinks = [
-  { to: "/", label: "Home" },
-  { to: "/catalog", label: "Catalog" },
-  { to: "/about", label: "About" },
-  { to: "/contact", label: "Contact" },
-];
+import { useAuth } from "../../context/AuthContext";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { totalItems } = useCart();
   const { totalFavorites } = useFavorites();
+  const { isAuthenticated } = useAuth();
+
+  const navLinks = [
+    { to: "/", label: "Home" },
+    { to: "/catalog", label: "Catalog" },
+    { to: "/about", label: "About" },
+    { to: "/contact", label: "Contact" },
+    ...(isAuthenticated ? [{ to: "/admin", label: "Admin" }] : []),
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-sage-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">

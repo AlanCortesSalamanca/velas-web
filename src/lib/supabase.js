@@ -17,9 +17,7 @@ if (missingVars.length > 0) {
 
 const supabase =
   supabaseUrl && supabaseAnonKey
-    ? createClient(supabaseUrl, supabaseAnonKey, {
-        auth: { persistSession: false },
-      })
+    ? createClient(supabaseUrl, supabaseAnonKey)
     : null;
 
 export { supabase };
