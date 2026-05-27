@@ -1,8 +1,10 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useFavorites } from "../context/FavoritesContext";
-import products from "../data/products";
+import { getProducts } from "../services/productsService";
+import { ProductCardSkeleton } from "../components/ui/Skeleton";
 import SEO from "../components/seo/SEO";
 import Container from "../components/ui/Container";
 import Button from "../components/ui/Button";
@@ -10,8 +12,21 @@ import ProductGrid from "../components/product/ProductGrid";
 
 export default function Favorites() {
   const { favoriteIds, totalFavorites } = useFavorites();
+  const [allProducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const favoriteProducts = products.filter((p) =>
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+    getProducts().then(({ data }) => {
+      if (!mounted) return;
+      setAllProducts(data || []);
+      setLoading(false);
+    });
+    return () => { mounted = false; };
+  }, []);
+
+  const favoriteProducts = allProducts.filter((p) =>
     favoriteIds.includes(p.id)
   );
 
@@ -35,7 +50,13 @@ export default function Favorites() {
         </p>
       </motion.div>
 
-      {favoriteProducts.length > 0 ? (
+      {loading && totalFavorites > 0 ? (
+        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: Math.min(totalFavorites, 4) }).map((_, i) => (
+            <ProductCardSkeleton key={i} />
+          ))}
+        </div>
+      ) : favoriteProducts.length > 0 ? (
         <motion.div
           key={favoriteProducts.length}
           initial={{ opacity: 0 }}

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import SEO from "../components/seo/SEO";
 import {
@@ -12,11 +13,12 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-import products from "../data/products";
+import { getFeaturedProducts } from "../services/productsService";
 import Container from "../components/ui/Container";
 import Button from "../components/ui/Button";
 import SectionTitle from "../components/ui/SectionTitle";
 import ProductGrid from "../components/product/ProductGrid";
+import { ProductCardSkeleton } from "../components/ui/Skeleton";
 
 /* ------------------------------------------------------------------ */
 /*  Mock data                                                         */
@@ -104,8 +106,6 @@ const testimonials = [
   },
 ];
 
-const featuredProducts = products.filter((p) => p.featured);
-
 /* ------------------------------------------------------------------ */
 /*  Animation variants                                                */
 /* ------------------------------------------------------------------ */
@@ -145,6 +145,26 @@ function Stars({ count = 5 }) {
 export default function Home() {
   const { scrollYProgress } = useScroll();
   const heroParallax = useTransform(scrollYProgress, [0, 0.15], [0, -40]);
+
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [featuredLoading, setFeaturedLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    setFeaturedLoading(true);
+
+    getFeaturedProducts()
+      .then(({ data }) => {
+        if (!mounted) return;
+        setFeaturedProducts(data || []);
+        console.log("[Home] Featured products loaded:", data?.length);
+      })
+      .finally(() => {
+        if (mounted) setFeaturedLoading(false);
+      });
+
+    return () => { mounted = false; };
+  }, []);
 
   return (
     <>
@@ -278,7 +298,15 @@ export default function Home() {
             variants={stagger}
             className="mt-10"
           >
-            <ProductGrid products={featuredProducts} columns={4} />
+            {featuredLoading ? (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <ProductCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : (
+              <ProductGrid products={featuredProducts} columns={4} />
+            )}
           </motion.div>
 
           <motion.div

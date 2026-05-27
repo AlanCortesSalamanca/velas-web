@@ -15,7 +15,7 @@ import {
   ChevronLeft,
   ArrowLeft,
 } from "lucide-react";
-import { getProductById, getRelatedProducts } from "../data/products";
+import { getProductById, getRelatedProducts } from "../services/productsService";
 import { useCart } from "../context/CartContext";
 import { useFavorites } from "../context/FavoritesContext";
 import SEO from "../components/seo/SEO";
@@ -24,6 +24,7 @@ import Button from "../components/ui/Button";
 import Badge from "../components/ui/Badge";
 import ProductGrid from "../components/product/ProductGrid";
 import ProductImage from "../components/product/ProductImage";
+import { ProductDetailsSkeleton } from "../components/ui/Skeleton";
 
 const categoryVariant = {
   candles: "brand",
@@ -65,18 +66,68 @@ export default function ProductDetails() {
   const { addToCart } = useCart();
   const { isFavorite, toggleFavorite } = useFavorites();
 
+  const [product, setProduct] = useState(null);
+  const [related, setRelated] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [added, setAdded] = useState(false);
 
-  const product = getProductById(id);
-
   useEffect(() => {
+    let mounted = true;
+    setLoading(true);
     setQuantity(1);
     setSelectedImage(0);
     setAdded(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
+
+    const load = async () => {
+      const { data: productData } = await getProductById(id);
+      if (!mounted) return;
+      setProduct(productData);
+      console.log("[ProductDetails] Loaded:", productData?.id);
+
+      if (productData) {
+        const { data: relatedData } = await getRelatedProducts(productData.category, productData.id);
+        if (mounted) setRelated(relatedData || []);
+      }
+      if (mounted) setLoading(false);
+    };
+
+    load();
+    return () => { mounted = false; };
   }, [id]);
+
+  if (loading) {
+    return (
+      <>
+        <SEO title="Loading..." />
+        <Container className="pt-6 pb-2">
+          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-sage-400">
+            <Link
+              to="/"
+              className="flex items-center gap-1 transition-colors hover:text-brand-600"
+            >
+              <Home className="h-3 w-3" />
+              Home
+            </Link>
+            <ChevronRight className="h-3 w-3" />
+            <Link
+              to="/catalog"
+              className="transition-colors hover:text-brand-600"
+            >
+              Catalog
+            </Link>
+            <ChevronRight className="h-3 w-3" />
+            <span className="font-medium text-sage-600">...</span>
+          </nav>
+        </Container>
+        <Container className="py-6 sm:py-10">
+          <ProductDetailsSkeleton />
+        </Container>
+      </>
+    );
+  }
 
   if (!product) {
     return (
@@ -104,7 +155,6 @@ export default function ProductDetails() {
     );
   }
 
-  const related = getRelatedProducts(product);
   const favorited = isFavorite(product.id);
   const gallery = [product.image, ...(product.galleryImages || [])];
 

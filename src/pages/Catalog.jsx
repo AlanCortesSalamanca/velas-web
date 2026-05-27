@@ -1,8 +1,8 @@
-import { useMemo, useCallback, useState } from "react";
+import { useMemo, useCallback, useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { SlidersHorizontal, SearchX, RotateCcw, ChevronDown } from "lucide-react";
-import products from "../data/products";
+import { getProducts } from "../services/productsService";
 import { filterProducts, sortOptions } from "../utils/filterProducts";
 import SEO from "../components/seo/SEO";
 import Container from "../components/ui/Container";
@@ -10,6 +10,7 @@ import SearchBar from "../components/ui/SearchBar";
 import FilterSidebar from "../components/ui/FilterSidebar";
 import Button from "../components/ui/Button";
 import ProductGrid from "../components/product/ProductGrid";
+import { ProductCardSkeleton } from "../components/ui/Skeleton";
 
 function useCatalogFilters() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -58,9 +59,31 @@ export default function Catalog() {
   const { filters, setFilters, resetFilters, hasActiveFilters } = useCatalogFilters();
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+    setLoading(true);
+
+    getProducts()
+      .then(({ data }) => {
+        if (!mounted) return;
+        setProducts(data || []);
+        console.log("[Catalog] Products loaded:", data?.length);
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   const result = useMemo(
     () => filterProducts(products, filters),
-    [filters]
+    [products, filters]
   );
 
   return (
@@ -169,6 +192,13 @@ export default function Catalog() {
 
         {/* Product grid */}
         <div className="min-w-0 flex-1">
+          {loading ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : (
           <AnimatePresence mode="wait">
             {result.length > 0 ? (
               <motion.div
@@ -210,6 +240,7 @@ export default function Catalog() {
               </motion.div>
             )}
           </AnimatePresence>
+          )}
         </div>
       </div>
     </Container>
