@@ -3,6 +3,7 @@ import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useFavorites } from "../context/FavoritesContext";
 import products from "../data/products";
+import SEO from "../components/seo/SEO";
 import Container from "../components/ui/Container";
 import Button from "../components/ui/Button";
 import ProductGrid from "../components/product/ProductGrid";
@@ -15,7 +16,10 @@ export default function Favorites() {
   );
 
   return (
-    <Container className="py-16">
+    <>
+      <SEO title="Favorites" description="Your saved handcrafted candles, succulents, and decor pieces." />
+
+      <Container className="py-16">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -63,5 +67,6 @@ export default function Favorites() {
         </motion.div>
       )}
     </Container>
+    </>
   );
 }

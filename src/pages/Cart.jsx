@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { generateWhatsAppUrl } from "../utils/generateWhatsAppMessage";
+import SEO from "../components/seo/SEO";
 import Container from "../components/ui/Container";
 import Button from "../components/ui/Button";
 import ProductImage from "../components/product/ProductImage";
@@ -41,7 +42,9 @@ export default function Cart() {
 
   if (items.length === 0) {
     return (
-      <Container className="py-20">
+      <>
+        <SEO title="Cart" description="Your custom order selection." />
+        <Container className="py-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -65,11 +68,14 @@ export default function Cart() {
           </Link>
         </motion.div>
       </Container>
+      </>
     );
   }
 
   return (
-    <Container className="py-12 sm:py-16">
+    <>
+      <SEO title="Cart" description="Review your selection and request a quote." />
+      <Container className="py-12 sm:py-16">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -238,5 +244,6 @@ export default function Cart() {
         </motion.div>
       </div>
     </Container>
+    </>
   );
 }

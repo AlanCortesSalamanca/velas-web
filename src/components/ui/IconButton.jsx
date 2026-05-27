@@ -19,7 +19,7 @@ const IconButton = forwardRef(function IconButton(
     <button
       ref={ref}
       aria-label={label}
-      className={`inline-flex items-center justify-center rounded-full transition-smooth cursor-pointer disabled:opacity-50 disabled:pointer-events-none ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`inline-flex items-center justify-center rounded-full transition-smooth cursor-pointer disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >
       {children}

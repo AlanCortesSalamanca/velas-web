@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { SlidersHorizontal, SearchX, RotateCcw, ChevronDown } from "lucide-react";
 import products from "../data/products";
 import { filterProducts, sortOptions } from "../utils/filterProducts";
+import SEO from "../components/seo/SEO";
 import Container from "../components/ui/Container";
 import SearchBar from "../components/ui/SearchBar";
 import FilterSidebar from "../components/ui/FilterSidebar";
@@ -63,7 +64,10 @@ export default function Catalog() {
   );
 
   return (
-    <Container className="py-10 sm:py-14">
+    <>
+      <SEO title="Catalog" description="Browse our handcrafted collection of candles, succulents, gift sets, and home accessories." />
+
+      <Container className="py-10 sm:py-14">
       {/* ---- Header ---- */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -209,5 +213,6 @@ export default function Catalog() {
         </div>
       </div>
     </Container>
+    </>
   );
 }

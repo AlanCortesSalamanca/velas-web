@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
+import SEO from "../components/seo/SEO";
 import {
   Sparkles,
   Leaf,
@@ -147,10 +148,12 @@ export default function Home() {
 
   return (
     <>
+      <SEO title="Home" description="Artisan candles and hand-selected succulents crafted to bring warmth, serenity, and timeless style into your home." />
+
       {/* ================================================================ */}
       {/*  HERO                                                             */}
       {/* ================================================================ */}
-      <section className="relative overflow-hidden bg-gradient-to-b from-sage-50 via-white to-white">
+      <section aria-label="Hero" className="relative overflow-hidden bg-gradient-to-b from-sage-50 via-white to-white">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--color-brand-50)_0%,_transparent_60%)] pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--color-mint-50)_0%,_transparent_60%)] pointer-events-none" />
 
@@ -258,7 +261,7 @@ export default function Home() {
       {/* ================================================================ */}
       {/*  FEATURED PRODUCTS                                                */}
       {/* ================================================================ */}
-      <section className="py-20 sm:py-28">
+      <section aria-label="Featured products" className="py-20 sm:py-28">
         <Container>
           <SectionTitle subtitle="Featured Collection">
             Best Sellers
@@ -298,7 +301,7 @@ export default function Home() {
       {/* ================================================================ */}
       {/*  CATEGORIES                                                       */}
       {/* ================================================================ */}
-      <section className="bg-sage-50 py-20 sm:py-28">
+      <section aria-label="Shop by category" className="bg-sage-50 py-20 sm:py-28">
         <Container>
           <SectionTitle subtitle="Shop by Category">
             Explore Our World
@@ -349,7 +352,7 @@ export default function Home() {
       {/* ================================================================ */}
       {/*  BRAND BENEFITS                                                   */}
       {/* ================================================================ */}
-      <section className="py-20 sm:py-28">
+      <section aria-label="Why choose us" className="py-20 sm:py-28">
         <Container>
           <SectionTitle subtitle="Why Choose Us">
             The Velas Difference
@@ -393,7 +396,7 @@ export default function Home() {
       {/* ================================================================ */}
       {/*  TESTIMONIALS                                                     */}
       {/* ================================================================ */}
-      <section className="bg-brand-50 py-20 sm:py-28">
+      <section aria-label="Customer testimonials" className="bg-brand-50 py-20 sm:py-28">
         <Container>
           <SectionTitle subtitle="Customer Love">
             What People Are Saying
@@ -432,7 +435,7 @@ export default function Home() {
       {/* ================================================================ */}
       {/*  WHATSAPP CTA                                                     */}
       {/* ================================================================ */}
-      <section className="relative overflow-hidden py-20 sm:py-28">
+      <section aria-label="Custom orders" className="relative overflow-hidden py-20 sm:py-28">
         <div className="absolute inset-0 bg-gradient-to-br from-sage-800 via-sage-700 to-sage-900 pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--color-brand-400)_0%,_transparent_50%)] opacity-20 pointer-events-none" />
 

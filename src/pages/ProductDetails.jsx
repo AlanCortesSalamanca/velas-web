@@ -18,6 +18,7 @@ import {
 import { getProductById, getRelatedProducts } from "../data/products";
 import { useCart } from "../context/CartContext";
 import { useFavorites } from "../context/FavoritesContext";
+import SEO from "../components/seo/SEO";
 import Container from "../components/ui/Container";
 import Button from "../components/ui/Button";
 import Badge from "../components/ui/Badge";
@@ -117,11 +118,16 @@ export default function ProductDetails() {
 
   return (
     <>
+      <SEO
+        title={product.name}
+        description={`${product.name} — ${product.description.substring(0, 120)}`}
+      />
+
       {/* ================================================================ */}
       {/*  BREADCRUMB                                                       */}
       {/* ================================================================ */}
       <Container className="pt-6 pb-2">
-        <nav className="flex items-center gap-2 text-xs text-sage-400">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-sage-400">
           <Link
             to="/"
             className="flex items-center gap-1 transition-colors hover:text-brand-600"
@@ -422,7 +428,7 @@ export default function ProductDetails() {
       {/*  RELATED PRODUCTS                                                 */}
       {/* ================================================================ */}
       {related.length > 0 && (
-        <section className="border-t border-sage-100 py-16 sm:py-20">
+        <section aria-label="Related products" className="border-t border-sage-100 py-16 sm:py-20">
           <Container>
             <motion.div
               initial={{ opacity: 0, y: 12 }}
@@ -448,7 +454,7 @@ export default function ProductDetails() {
       {/* ================================================================ */}
       {/*  MOBILE STICKY CTA                                                */}
       {/* ================================================================ */}
-      <div className="sticky bottom-0 z-40 border-t border-sage-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 lg:hidden">
+      <div className="sticky bottom-0 z-40 border-t border-sage-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 lg:hidden" role="toolbar" aria-label="Product actions">
         <div className="flex items-center gap-3 px-4 py-3">
           <div className="flex-1">
             <p className="text-sm font-semibold text-sage-800">

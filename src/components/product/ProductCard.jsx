@@ -22,7 +22,7 @@ export default function ProductCard({ product, index = 0 }) {
       transition={{ duration: 0.4, delay: index * 0.05 }}
       className="group relative flex flex-col gap-3"
     >
-      <Link to={`/product/${product.id}`} className="block">
+      <Link to={`/product/${product.id}`} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 rounded-lg" aria-label={`View ${product.name}`}>
         <div className="relative">
           <ProductImage src={product.image} alt={product.name} />
 
@@ -49,6 +49,7 @@ export default function ProductCard({ product, index = 0 }) {
           onClick={() => addToCart(product)}
           disabled={!product.stock}
           className="flex-1"
+          aria-label={`Add ${product.name} to selection`}
         >
           <ShoppingCart className="h-3.5 w-3.5" />
           {product.stock ? "Add to Selection" : "Out of Stock"}
@@ -57,7 +58,7 @@ export default function ProductCard({ product, index = 0 }) {
         <IconButton
           variant="ghost"
           size="md"
-          label={favorited ? "Remove from favorites" : "Add to favorites"}
+          label={favorited ? `Remove ${product.name} from favorites` : `Add ${product.name} to favorites`}
           onClick={() => toggleFavorite(product.id, product.name)}
           className={`${
             favorited
