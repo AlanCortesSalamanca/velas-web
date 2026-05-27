@@ -73,10 +73,10 @@ export default function QuoteRequestsTable({ requests = [], className = "" }) {
                   {req.unique_products ?? req.items?.length ?? "—"}
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-sage-700 sm:px-5">
-                  {req.total_pieces ?? "—"}
+                  {req.desired_total_pieces ?? "—"}
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 font-medium text-sage-800 sm:px-5">
-                  {formatCurrency(req.subtotal)}
+                  {formatCurrency(req.estimated_subtotal)}
                 </td>
                 <td className="px-4 py-3 sm:px-5">
                   <StatusBadge status={req.status} />

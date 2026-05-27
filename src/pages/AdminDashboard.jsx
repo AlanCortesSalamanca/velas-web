@@ -79,15 +79,15 @@ export default function AdminDashboard() {
   const stats = useMemo(() => {
     const totalRequests = requests.length;
     const totalPieces = requests.reduce(
-      (sum, r) => sum + (r.total_pieces || 0),
+      (sum, r) => sum + (r.desired_total_pieces || 0),
       0
     );
-    const totalSubtotal = requests.reduce(
-      (sum, r) => sum + (Number(r.subtotal) || 0),
+    const totalEstimated = requests.reduce(
+      (sum, r) => sum + (Number(r.estimated_subtotal) || 0),
       0
     );
-    const avgValue = totalRequests > 0 ? totalSubtotal / totalRequests : 0;
-    return { totalRequests, totalPieces, totalSubtotal, avgValue };
+    const avgValue = totalRequests > 0 ? totalEstimated / totalRequests : 0;
+    return { totalRequests, totalPieces, totalEstimated, avgValue };
   }, [requests]);
 
   return (
@@ -163,7 +163,7 @@ export default function AdminDashboard() {
               <AdminStatCard
                 icon={DollarSign}
                 label="Total Estimated"
-                value={`$${stats.totalSubtotal.toFixed(2)}`}
+                value={`$${stats.totalEstimated.toFixed(2)}`}
                 index={2}
               />
               <AdminStatCard

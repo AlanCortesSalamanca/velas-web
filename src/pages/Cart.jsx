@@ -45,8 +45,8 @@ export default function Cart() {
         quantity: i.quantity,
         price: i.product.price,
       })),
-      subtotal,
-      totalPieces: totalItems,
+      estimatedSubtotal: subtotal,
+      desiredTotalPieces: totalItems,
       uniqueProducts: items.length,
     };
 

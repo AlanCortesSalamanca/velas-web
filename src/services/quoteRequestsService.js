@@ -1,42 +1,17 @@
 import supabase from "../lib/supabase";
 
-/**
- * QUOTE REQUESTS SERVICE
- * ======================
- *
- * Persists quote requests to the Supabase `quote_requests` table.
- *
- * Expected Supabase table: "quote_requests"
- * Columns:
- *   id             UUID (auto-generated)
- *   items          JSONB    — array of { productId, name, quantity, price }
- *   subtotal       numeric  — sum of item prices x quantities
- *   total_pieces   integer  — sum of all quantities
- *   unique_products integer — number of distinct items
- *   status         text     — default: 'received'
- *   created_at     timestamptz (auto-generated)
- *
- * ------------------------------------------------------------------
- *  FALLBACK BEHAVIOR
- * ------------------------------------------------------------------
- * If Supabase is unavailable, the request is logged to the console
- * and the WhatsApp flow continues uninterrupted. The fallback
- * prevents a DB issue from blocking the customer's order.
- * ------------------------------------------------------------------
- */
-
-export async function createQuoteRequest({ items, subtotal, totalPieces, uniqueProducts }) {
+export async function createQuoteRequest({ items, estimatedSubtotal, desiredTotalPieces, uniqueProducts }) {
   const payload = {
     items,
-    subtotal,
-    total_pieces: totalPieces,
+    estimated_subtotal: estimatedSubtotal,
+    desired_total_pieces: desiredTotalPieces,
     unique_products: uniqueProducts,
     status: "received",
   };
 
   if (!supabase) {
     console.log(
-      "[quoteRequestsService] Supabase client unavailable — quote request NOT persisted:",
+      "[quoteRequestsService] Supabase client unavailable — quote request NOT persisted. Payload:",
       payload
     );
     return { data: { id: "offline", ...payload }, error: null, fallback: true };
@@ -49,16 +24,19 @@ export async function createQuoteRequest({ items, subtotal, totalPieces, uniqueP
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error("[quoteRequestsService] Supabase insert error:", error);
+      throw error;
+    }
 
-    console.log("[quoteRequestsService] Quote request saved successfully:", data.id);
+    console.log("[quoteRequestsService] Quote request saved successfully. ID:", data.id, "Payload:", payload);
     return { data, error: null, fallback: false };
   } catch (err) {
     console.warn(
       "[quoteRequestsService] Failed to persist quote request to Supabase:",
       err?.message || err
     );
-    console.log("[quoteRequestsService] WhatsApp flow will continue without persistence.");
+    console.log("[quoteRequestsService] WhatsApp flow will continue without persistence. Data:", payload);
     return { data: { id: "unpersisted", ...payload }, error: err, fallback: true };
   }
 }
@@ -75,11 +53,15 @@ export async function getQuoteRequests() {
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error("[quoteRequestsService] Supabase select error:", error);
+      throw error;
+    }
 
+    console.log("[quoteRequestsService] Fetched", data?.length ?? 0, "quote requests from Supabase.");
     return { data: data || [], error: null };
   } catch (err) {
-    console.warn("[quoteRequestsService] Failed to fetch quote requests:", err?.message || err);
+    console.error("[quoteRequestsService] Failed to fetch quote requests:", err?.message || err);
     return { data: [], error: err };
   }
 }
