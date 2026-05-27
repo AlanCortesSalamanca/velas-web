@@ -1,43 +1,29 @@
 import supabase from "../lib/supabase";
 
 /**
- * Temporary fallback: local product data.
+ * PRODUCTS SERVICE
+ * ================
+ *
+ * Supabase (PostgreSQL) is the **primary source of truth** for product data.
  *
  * ------------------------------------------------------------------
- *  WHY THIS FALLBACK EXISTS
+ *  FALLBACK BEHAVIOR
  * ------------------------------------------------------------------
- * This application was built with static mock data during frontend
- * development. The service layer below wraps Supabase queries and
- * falls back to that local data when:
+ * Every function falls back to a minimal local dataset when:
  *
- *   1. Supabase environment variables are not configured yet.
+ *   1. Supabase environment variables are not configured.
  *   2. The Supabase client fails to initialize.
  *   3. A database query returns an error (network, permissions, etc.).
  *
- * This pattern lets the frontend remain fully functional during
- * development while the backend is being set up, and also acts as
- * a safety net in production if the database becomes unreachable.
+ * The fallback dataset (src/data/products.js) contains 3 generic
+ * entries and is NOT a substitute for real database content. It
+ * exists only to keep the UI functional during outages.
  *
- * ------------------------------------------------------------------
- *  FUTURE DB INTEGRATION
- * ------------------------------------------------------------------
- * When the Supabase tables are created, replace the `fallback` calls
- * below with real Supabase queries. The async function signatures
- * will remain the same, so no UI code needs to change.
- *
- * Expected Supabase table: "products"
- * Columns: id, name, category, price, image, description, featured,
- *          stock, materials, fragrance, dimensions,
- *          handcraftedDetails, galleryImages, created_at
- *
- * The `galleryImages` column should be stored as a JSONB array.
+ * See src/data/products.js for the full fallback rationale.
  * ------------------------------------------------------------------
  */
 
-import localProducts, {
-  getProductById as getLocalById,
-  getRelatedProducts as getLocalRelated,
-} from "../data/products";
+import fallbackProducts from "../data/products";
 
 /* ---- helpers -------------------------------------------------- */
 
@@ -59,20 +45,8 @@ function mapSupabaseProduct(row) {
   };
 }
 
-/* ---- public API ----------------------------------------------- */
-
-/**
- * Fetch all products from Supabase.
- * Falls back to local mock data if the DB is unavailable.
- *
- * @param {object} [options]
- * @param {string} [options.category] - Filter by category
- * @param {boolean} [options.featuredOnly] - Only featured products
- * @param {string} [options.sortBy] - "price-asc" | "price-desc" | "name"
- * @returns {Promise<{ data: Array, error: Error|null }>}
- */
 function filterLocalProducts(options = {}) {
-  let result = [...localProducts];
+  let result = [...fallbackProducts];
   if (options.category) {
     result = result.filter((p) => p.category === options.category);
   }
@@ -81,6 +55,18 @@ function filterLocalProducts(options = {}) {
   }
   return result;
 }
+
+function findLocalById(id) {
+  return fallbackProducts.find((p) => p.id === id) || null;
+}
+
+function findLocalRelated(category, currentId) {
+  return fallbackProducts.filter(
+    (p) => p.category === category && p.id !== currentId
+  );
+}
+
+/* ---- public API ----------------------------------------------- */
 
 export async function getProducts(options = {}) {
   if (!supabase) {
@@ -105,10 +91,7 @@ export async function getProducts(options = {}) {
 
     const mapped = (data || []).map(mapSupabaseProduct);
     console.log(`[productsService] Supabase returned ${mapped.length} products.`);
-    return {
-      data: mapped,
-      error: null,
-    };
+    return { data: mapped, error: null };
   } catch (err) {
     const data = filterLocalProducts(options);
     console.warn(
@@ -119,15 +102,9 @@ export async function getProducts(options = {}) {
   }
 }
 
-/**
- * Fetch a single product by ID.
- *
- * @param {string} id
- * @returns {Promise<{ data: object|null, error: Error|null }>}
- */
 export async function getProductById(id) {
   if (!supabase) {
-    const data = getLocalById(id);
+    const data = findLocalById(id);
     console.log("[productsService] Supabase client unavailable — using local fallback for", id);
     return { data, error: null };
   }
@@ -147,7 +124,7 @@ export async function getProductById(id) {
     }
     return { data: null, error: null };
   } catch (err) {
-    const fallback = getLocalById(id);
+    const fallback = findLocalById(id);
     console.warn(
       `[productsService] Supabase fetch failed for "${id}" (${err?.message || err}), ` +
       `falling back to local${fallback ? `: "${fallback.name}"` : " — not found"}.`
@@ -156,25 +133,13 @@ export async function getProductById(id) {
   }
 }
 
-/**
- * Fetch featured products.
- *
- * @returns {Promise<{ data: Array, error: Error|null }>}
- */
 export async function getFeaturedProducts() {
   return getProducts({ featuredOnly: true });
 }
 
-/**
- * Fetch related products (same category, excluding current).
- *
- * @param {string} category
- * @param {string} currentId
- * @returns {Promise<{ data: Array, error: Error|null }>}
- */
 export async function getRelatedProducts(category, currentId) {
   if (!supabase) {
-    const data = getLocalRelated({ id: currentId, category });
+    const data = findLocalRelated(category, currentId);
     console.log("[productsService] Supabase client unavailable — local related fallback for", currentId);
     return { data, error: null };
   }
@@ -193,7 +158,7 @@ export async function getRelatedProducts(category, currentId) {
     console.log(`[productsService] Supabase returned ${mapped.length} related products for "${category}".`);
     return { data: mapped, error: null };
   } catch (err) {
-    const fallback = getLocalRelated({ id: currentId, category });
+    const fallback = findLocalRelated(category, currentId);
     console.warn(
       `[productsService] Supabase related fetch failed (${err?.message || err}), ` +
       `falling back to ${fallback.length} local related products.`

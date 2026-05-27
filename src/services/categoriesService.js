@@ -1,5 +1,6 @@
 /**
- * Categories service.
+ * CATEGORIES SERVICE
+ * ==================
  *
  * ------------------------------------------------------------------
  *  FUTURE DB INTEGRATION
@@ -7,8 +8,7 @@
  * Expected Supabase table: "categories"
  * Columns: id, name, slug, description, image, display_order
  *
- * Until the table is created, this service returns static data.
- * When ready, replace the mock with:
+ * When the table exists, replace the static array with:
  *
  *   const { data, error } = await supabase
  *     .from("categories")
@@ -17,7 +17,13 @@
  * ------------------------------------------------------------------
  */
 
-import { categories } from "../data/products";
+const categories = [
+  { id: "all", label: "All Products" },
+  { id: "candles", label: "Candles" },
+  { id: "succulents", label: "Succulents" },
+  { id: "sets", label: "Gift Sets" },
+  { id: "accessories", label: "Accessories" },
+];
 
 export async function getCategories() {
   return { data: categories, error: null };
