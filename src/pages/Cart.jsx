@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
@@ -10,7 +10,9 @@ import {
   MessageCircle,
   FileText,
 } from "lucide-react";
+import toast from "react-hot-toast";
 import { useCart } from "../context/CartContext";
+import { createQuoteRequest } from "../services/quoteRequestsService";
 import { generateWhatsAppUrl } from "../utils/generateWhatsAppMessage";
 import SEO from "../components/seo/SEO";
 import Container from "../components/ui/Container";
@@ -33,12 +35,34 @@ export default function Cart() {
     useCart();
   const [sending, setSending] = useState(false);
 
-  const handleWhatsApp = () => {
+  const handleWhatsApp = useCallback(async () => {
     setSending(true);
+
+    const quoteData = {
+      items: items.map((i) => ({
+        productId: i.productId,
+        name: i.product.name,
+        quantity: i.quantity,
+        price: i.product.price,
+      })),
+      subtotal,
+      totalPieces: totalItems,
+      uniqueProducts: items.length,
+    };
+
+    const { fallback } = await createQuoteRequest(quoteData);
+
+    if (fallback) {
+      console.log("[Cart] Quote request logged locally (DB unavailable).");
+    } else {
+      console.log("[Cart] Quote request saved to Supabase. Opening WhatsApp.");
+      toast.success("Quote saved! Opening WhatsApp...");
+    }
+
     const url = generateWhatsAppUrl(items, subtotal);
     window.open(url, "_blank", "noopener,noreferrer");
     setTimeout(() => setSending(false), 800);
-  };
+  }, [items, subtotal, totalItems]);
 
   if (items.length === 0) {
     return (

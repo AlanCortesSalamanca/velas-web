@@ -1,47 +1,85 @@
+import supabase from "../lib/supabase";
+
 /**
- * Quote requests service.
+ * QUOTE REQUESTS SERVICE
+ * ======================
  *
- * ------------------------------------------------------------------
- *  FUTURE DB INTEGRATION
- * ------------------------------------------------------------------
+ * Persists quote requests to the Supabase `quote_requests` table.
+ *
  * Expected Supabase table: "quote_requests"
- * Columns: id, customer_name, email, phone, message, items (JSONB),
- *          status, created_at
+ * Columns:
+ *   id             UUID (auto-generated)
+ *   items          JSONB    — array of { productId, name, quantity, price }
+ *   subtotal       numeric  — sum of item prices x quantities
+ *   total_pieces   integer  — sum of all quantities
+ *   unique_products integer — number of distinct items
+ *   status         text     — default: 'received'
+ *   created_at     timestamptz (auto-generated)
  *
- * When ready, replace the mock with:
- *
- *   const { data, error } = await supabase
- *     .from("quote_requests")
- *     .insert([{ customer_name, email, phone, message, items }])
- *     .select()
- *     .single();
+ * ------------------------------------------------------------------
+ *  FALLBACK BEHAVIOR
+ * ------------------------------------------------------------------
+ * If Supabase is unavailable, the request is logged to the console
+ * and the WhatsApp flow continues uninterrupted. The fallback
+ * prevents a DB issue from blocking the customer's order.
  * ------------------------------------------------------------------
  */
 
-/**
- * Submit a quote request to the database.
- *
- * @param {object} payload
- * @param {string} payload.customerName
- * @param {string} payload.email
- * @param {string} [payload.phone]
- * @param {string} [payload.message]
- * @param {Array}  payload.items - Array of { productId, name, quantity, price }
- * @returns {Promise<{ data: object|null, error: Error|null }>}
- */
-export async function submitQuoteRequest(payload) {
-  // TODO: Replace with real Supabase insert when the table exists.
-  console.log("[quoteRequestsService] Quote request received (not yet persisted):", payload);
-  return {
-    data: { id: "placeholder", status: "received", ...payload },
-    error: null,
+export async function createQuoteRequest({ items, subtotal, totalPieces, uniqueProducts }) {
+  const payload = {
+    items,
+    subtotal,
+    total_pieces: totalPieces,
+    unique_products: uniqueProducts,
+    status: "received",
   };
+
+  if (!supabase) {
+    console.log(
+      "[quoteRequestsService] Supabase client unavailable — quote request NOT persisted:",
+      payload
+    );
+    return { data: { id: "offline", ...payload }, error: null, fallback: true };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from("quote_requests")
+      .insert([payload])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    console.log("[quoteRequestsService] Quote request saved successfully:", data.id);
+    return { data, error: null, fallback: false };
+  } catch (err) {
+    console.warn(
+      "[quoteRequestsService] Failed to persist quote request to Supabase:",
+      err?.message || err
+    );
+    console.log("[quoteRequestsService] WhatsApp flow will continue without persistence.");
+    return { data: { id: "unpersisted", ...payload }, error: err, fallback: true };
+  }
 }
 
-/**
- * Fetch all quote requests (admin use — future).
- */
 export async function getQuoteRequests() {
-  // TODO: Replace with Supabase query when admin panel is built.
-  return { data: [], error: null };
+  if (!supabase) {
+    console.log("[quoteRequestsService] Supabase client unavailable — returning empty list.");
+    return { data: [], error: null };
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from("quote_requests")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+
+    return { data: data || [], error: null };
+  } catch (err) {
+    console.warn("[quoteRequestsService] Failed to fetch quote requests:", err?.message || err);
+    return { data: [], error: err };
+  }
 }
