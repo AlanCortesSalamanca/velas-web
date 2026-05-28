@@ -6,7 +6,7 @@ import Button from "./Button";
 function FilterGroup({ title, children }) {
   return (
     <div className="space-y-3">
-      <p className="text-xs font-semibold uppercase tracking-wider text-sage-400">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-sage-400">
         {title}
       </p>
       {children}
@@ -16,16 +16,16 @@ function FilterGroup({ title, children }) {
 
 function Checkbox({ label, checked, onChange }) {
   return (
-    <label className="flex cursor-pointer items-center gap-2.5 group">
+    <label className="flex cursor-pointer items-center gap-3 group">
       <span
-        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 transition-smooth ${
+        className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-md border-2 transition-all duration-300 ${
           checked
-            ? "border-brand-500 bg-brand-500"
-            : "border-sage-300 bg-white group-hover:border-brand-300"
+            ? "border-terra-400 bg-terra-500 shadow-sm"
+            : "border-sage-300/60 bg-white group-hover:border-terra-300/60"
         }`}
       >
         {checked && (
-          <svg className="h-2.5 w-2.5 text-white" fill="none" viewBox="0 0 12 12">
+          <svg className="h-3 w-3 text-white" fill="none" viewBox="0 0 12 12">
             <path
               d="M2 6l3 3 5-5"
               stroke="currentColor"
@@ -42,7 +42,9 @@ function Checkbox({ label, checked, onChange }) {
         onChange={onChange}
         className="sr-only"
       />
-      <span className="text-sm text-sage-700 select-none">{label}</span>
+      <span className="text-sm text-sage-600 select-none group-hover:text-sage-800 transition-colors duration-200">
+        {label}
+      </span>
     </label>
   );
 }
@@ -50,15 +52,17 @@ function Checkbox({ label, checked, onChange }) {
 function Toggle({ label, checked, onChange }) {
   return (
     <label className="flex cursor-pointer items-center justify-between group">
-      <span className="text-sm text-sage-700 select-none">{label}</span>
+      <span className="text-sm text-sage-600 select-none group-hover:text-sage-800 transition-colors duration-200">
+        {label}
+      </span>
       <span
-        className={`relative inline-flex h-5 w-9 shrink-0 rounded-full border-2 border-transparent transition-smooth cursor-pointer ${
-          checked ? "bg-brand-500" : "bg-sage-200"
+        className={`relative inline-flex h-5.5 w-10 shrink-0 rounded-full border-2 border-transparent transition-all duration-300 cursor-pointer ${
+          checked ? "bg-terra-400" : "bg-sage-200/60"
         }`}
       >
         <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-soft transition-smooth ${
-            checked ? "translate-x-4" : "translate-x-0"
+          className={`inline-block h-4.5 w-4.5 transform rounded-full bg-white shadow-sm transition-all duration-300 ${
+            checked ? "translate-x-4.5" : "translate-x-0.5"
           }`}
         />
       </span>
@@ -74,15 +78,15 @@ function Toggle({ label, checked, onChange }) {
 
 function SortRadio({ label, checked, onChange }) {
   return (
-    <label className="flex cursor-pointer items-center gap-2.5 group">
+    <label className="flex cursor-pointer items-center gap-3 group">
       <span
-        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-smooth ${
+        className={`flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-300 ${
           checked
-            ? "border-brand-500"
-            : "border-sage-300 group-hover:border-brand-300"
+            ? "border-terra-400"
+            : "border-sage-300/60 group-hover:border-terra-300/60"
         }`}
       >
-        {checked && <span className="h-2 w-2 rounded-full bg-brand-500" />}
+        {checked && <span className="h-2.5 w-2.5 rounded-full bg-terra-500 shadow-sm" />}
       </span>
       <input
         type="radio"
@@ -90,7 +94,9 @@ function SortRadio({ label, checked, onChange }) {
         onChange={onChange}
         className="sr-only"
       />
-      <span className="text-sm text-sage-700 select-none">{label}</span>
+      <span className="text-sm text-sage-600 select-none group-hover:text-sage-800 transition-colors duration-200">
+        {label}
+      </span>
     </label>
   );
 }
@@ -122,28 +128,26 @@ export default function FilterSidebar({
 
   const content = (
     <div className="flex h-full flex-col">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-sage-100 px-5 py-4">
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal className="h-4 w-4 text-sage-600" />
-          <span className="text-sm font-semibold text-sage-800">Filters</span>
+      <div className="flex items-center justify-between border-b border-sage-100/60 px-6 py-5">
+        <div className="flex items-center gap-2.5">
+          <SlidersHorizontal className="h-4 w-4 text-sage-400" />
+          <span className="text-sm font-semibold text-sage-700">Filters</span>
           {activeCount > 0 && (
-            <span className="rounded-full bg-brand-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+            <span className="rounded-full bg-terra-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-sm">
               {activeCount}
             </span>
           )}
         </div>
         <button
           onClick={onClose}
-          className="text-sage-400 transition-colors hover:text-sage-600 lg:hidden"
+          className="text-sage-300 transition-colors hover:text-sage-500 lg:hidden"
+          aria-label="Close filters"
         >
           <X className="h-5 w-5" />
         </button>
       </div>
 
-      {/* Body */}
-      <div className="flex-1 space-y-6 overflow-y-auto px-5 py-6">
-        {/* Category */}
+      <div className="flex-1 space-y-6 overflow-y-auto px-6 py-6">
         <FilterGroup title="Category">
           {categoryOptions.map((cat) => (
             <Checkbox
@@ -155,9 +159,8 @@ export default function FilterSidebar({
           ))}
         </FilterGroup>
 
-        <hr className="border-sage-100" />
+        <hr className="border-sage-100/60" />
 
-        {/* Availability */}
         <FilterGroup title="Availability">
           <Toggle
             label="In stock only"
@@ -166,9 +169,8 @@ export default function FilterSidebar({
           />
         </FilterGroup>
 
-        <hr className="border-sage-100" />
+        <hr className="border-sage-100/60" />
 
-        {/* Featured */}
         <FilterGroup title="Curated">
           <Toggle
             label="Featured products"
@@ -182,9 +184,8 @@ export default function FilterSidebar({
           />
         </FilterGroup>
 
-        <hr className="border-sage-100" />
+        <hr className="border-sage-100/60" />
 
-        {/* Sort */}
         <FilterGroup title="Sort by">
           {sortOptions.map((opt) => (
             <SortRadio
@@ -197,10 +198,11 @@ export default function FilterSidebar({
         </FilterGroup>
       </div>
 
-      {/* Footer */}
-      <div className="border-t border-sage-100 px-5 py-4">
+      <div className="border-t border-sage-100/60 px-6 py-4">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-xs text-sage-400">{resultCount} products</p>
+          <p className="text-xs text-sage-400 font-medium">
+            {resultCount} product{resultCount !== 1 ? "s" : ""}
+          </p>
           {activeCount > 0 && (
             <Button
               variant="ghost"
@@ -219,14 +221,12 @@ export default function FilterSidebar({
 
   return (
     <>
-      {/* Desktop sidebar */}
       <aside className="hidden w-64 shrink-0 lg:block">
-        <div className="sticky top-28 rounded-xl border border-sage-100 bg-white shadow-soft">
+        <div className="sticky top-28 rounded-2xl bg-white/60 backdrop-blur-sm border border-sage-100/60 shadow-soft">
           {content}
         </div>
       </aside>
 
-      {/* Mobile slide-over */}
       <AnimatePresence>
         {isOpen && (
           <>
@@ -234,16 +234,16 @@ export default function FilterSidebar({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-50 bg-sage-900/30 backdrop-blur-sm lg:hidden"
+              transition={{ duration: 0.25 }}
+              className="fixed inset-0 z-50 bg-sage-900/20 backdrop-blur-sm lg:hidden"
               onClick={onClose}
             />
             <motion.aside
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white shadow-elevated lg:hidden"
+              transition={{ type: "spring", damping: 28, stiffness: 280 }}
+              className="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-cream-50 shadow-elevated lg:hidden"
             >
               {content}
             </motion.aside>

@@ -5,7 +5,7 @@ export default function ProductPrice({ price, originalPrice, className = "" }) {
         ${price.toFixed(2)}
       </span>
       {originalPrice && (
-        <span className="text-sm text-sage-400 line-through">
+        <span className="text-sm text-sage-300 line-through">
           ${originalPrice.toFixed(2)}
         </span>
       )}

@@ -1,7 +1,7 @@
 const statusStyles = {
-  received: "bg-sage-100 text-sage-700",
-  contacted: "bg-brand-100 text-brand-700",
-  completed: "bg-mint-100 text-mint-700",
+  received: "bg-sage-100/80 text-sage-600",
+  contacted: "bg-terra-100/80 text-terra-700",
+  completed: "bg-mint-100/80 text-mint-700",
 };
 
 const statusLabels = {
@@ -14,16 +14,16 @@ export default function StatusBadge({ status = "received", className = "" }) {
   const key = status?.toLowerCase() || "received";
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider ${
         statusStyles[key] || statusStyles.received
       } ${className}`}
     >
       <span
-        className={`h-1.5 w-1.5 rounded-full ${
+        className={`h-2 w-2 rounded-full ${
           key === "received"
-            ? "bg-sage-500"
+            ? "bg-sage-400"
             : key === "contacted"
-            ? "bg-brand-500"
+            ? "bg-terra-500"
             : "bg-mint-500"
         }`}
       />

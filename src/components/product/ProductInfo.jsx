@@ -16,12 +16,14 @@ const categoryVariants = {
 
 export default function ProductInfo({ name, category, description, className = "" }) {
   return (
-    <div className={`space-y-1.5 ${className}`}>
+    <div className={`space-y-2 ${className}`}>
       <Badge variant={categoryVariants[category] || "default"} size="sm">
         {categoryLabels[category] || category}
       </Badge>
-      <h3 className="font-medium text-sage-800 line-clamp-1">{name}</h3>
-      <p className="text-sm text-sage-500 line-clamp-2 leading-relaxed">
+      <h3 className="font-medium text-sage-800 line-clamp-1 group-hover:text-terra-600 transition-colors duration-300">
+        {name}
+      </h3>
+      <p className="text-sm text-sage-400 line-clamp-2 leading-relaxed font-light">
         {description}
       </p>
     </div>

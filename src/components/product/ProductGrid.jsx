@@ -8,7 +8,7 @@ export default function ProductGrid({ products, columns = 3, className = "" }) {
   };
 
   return (
-    <div className={`grid grid-cols-1 gap-6 ${cols[columns] || cols[3]} ${className}`}>
+    <div className={`grid grid-cols-1 gap-5 sm:gap-6 ${cols[columns] || cols[3]} ${className}`}>
       {products.map((product, i) => (
         <ProductCard key={product.id} product={product} index={i} />
       ))}

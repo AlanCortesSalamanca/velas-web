@@ -43,25 +43,53 @@ export async function createQuoteRequest({ items, estimatedSubtotal, desiredTota
 
 export async function getQuoteRequests() {
   if (!supabase) {
-    console.log("[quoteRequestsService] Supabase client unavailable — returning empty list.");
+    console.warn("[quoteRequestsService] Supabase client is null — returning empty list. Check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY env vars.");
     return { data: [], error: null };
   }
 
+  console.log("[quoteRequestsService] Supabase client OK. Fetching quote_requests...");
+
   try {
-    const { data, error } = await supabase
+    const response = await supabase
       .from("quote_requests")
       .select("*")
       .order("created_at", { ascending: false });
 
+    const { data, error } = response;
+
+    console.log("[quoteRequestsService] Raw Supabase response:", {
+      hasData: !!data,
+      dataType: typeof data,
+      isArray: Array.isArray(data),
+      dataLength: Array.isArray(data) ? data.length : "N/A",
+      hasError: !!error,
+      errorCode: error?.code ?? null,
+      errorMessage: error?.message ?? null,
+      errorDetails: error?.details ?? null,
+    });
+
     if (error) {
-      console.error("[quoteRequestsService] Supabase select error:", error);
-      throw error;
+      console.error("[quoteRequestsService] Supabase select error (code: " + error.code + "):", error.message, error.details);
+      return { data: [], error };
     }
 
-    console.log("[quoteRequestsService] Fetched", data?.length ?? 0, "quote requests from Supabase.");
-    return { data: data || [], error: null };
+    const records = Array.isArray(data) ? data : [];
+    console.log("[quoteRequestsService] Successfully fetched", records.length, "quote request(s).");
+    if (records.length > 0) {
+      console.log("[quoteRequestsService] First record sample:", {
+        id: records[0].id,
+        status: records[0].status,
+        unique_products: records[0].unique_products,
+        desired_total_pieces: records[0].desired_total_pieces,
+        estimated_subtotal: records[0].estimated_subtotal,
+        created_at: records[0].created_at,
+      });
+    }
+    return { data: records, error: null };
   } catch (err) {
-    console.error("[quoteRequestsService] Failed to fetch quote requests:", err?.message || err);
+    console.error("[quoteRequestsService] Caught exception during fetch:", err);
+    if (err?.message) console.error("[quoteRequestsService] Exception message:", err.message);
+    if (err?.stack) console.error("[quoteRequestsService] Exception stack:", err.stack);
     return { data: [], error: err };
   }
 }

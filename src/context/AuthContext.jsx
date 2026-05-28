@@ -4,25 +4,43 @@ import { supabase } from "../lib/supabase";
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [currentUser, setCurrentUser] = useState(null);
+  const [user, setUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("[Auth] Checking session...");
+
     if (!supabase) {
       setLoading(false);
       return;
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setCurrentUser(session?.user ?? null);
+    let mounted = true;
+
+    supabase.auth.getSession().then(({ data: { session: s } }) => {
+      if (!mounted) return;
+      if (s) {
+        console.log("[Auth] Session restored");
+      } else {
+        console.log("[Auth] No session found");
+      }
+      setSession(s);
+      setUser(s?.user ?? null);
       setLoading(false);
+      console.log("[Auth] Loading complete");
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setCurrentUser(session?.user ?? null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      if (!mounted) return;
+      setSession(s);
+      setUser(s?.user ?? null);
     });
 
-    return () => subscription?.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription?.unsubscribe();
+    };
   }, []);
 
   const login = useCallback(async (email, password) => {
@@ -31,20 +49,27 @@ export function AuthProvider({ children }) {
     }
 
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    if (error) {
+      const message =
+        error.message === "Invalid login credentials"
+          ? "Invalid email or password."
+          : error.message;
+      throw new Error(message);
+    }
     return data;
   }, []);
 
   const logout = useCallback(async () => {
     if (!supabase) return;
     const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    if (error) throw new Error(error.message || "Failed to sign out.");
   }, []);
 
   const value = {
-    currentUser,
+    user,
+    session,
     loading,
-    isAuthenticated: !!currentUser,
+    isAuthenticated: !!user,
     login,
     logout,
   };
